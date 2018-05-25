@@ -4,10 +4,9 @@
 #include <MotorWheel.h>
 #include <Omni3WD.h>
 
-class WheelDriveClass {
+namespace WheelDrive {
 
- public:
-  void enable();
+  void setup();
 
   void goLeft(unsigned int distance);
 
@@ -19,13 +18,6 @@ class WheelDriveClass {
 
   void stop();
 
- private:
-  void setStopSpeed(char state);
-
-  void regulatePID();
-
 };
-
-extern WheelDriveClass WheelDrive;
 
 #endif
