@@ -13,19 +13,9 @@ enum direction {
 State* state;
 unsigned int dist = 50;
 
-void commandReceived(int length, char* data) {
-  for (int i = 0; i < length; ++i) {
-    Serial.print(data[i]);
-  }
-  Serial.println(' ');
-  int* distances = state->getDistances();
-  for (int i = 0; i < NUM_DISTANCE_SENSORS; ++i) {
-    Serial.print(distances[i]);
-    Serial.print(' ');
-  }
-  Serial.println(' ');
-  char inChar = data[0];
-  switch(inChar) {
+void commandReceived(int length, byte* data) {
+  byte inByte = data[0];
+  switch(inByte) {
   case left:
     WheelDrive::goLeft(dist);
     break;
@@ -42,12 +32,8 @@ void commandReceived(int length, char* data) {
   }
 }
 
-void commandSent(int length, char* data) {
-  for (int i = 0; i < length; ++i) {
-    Serial.print(data[i], DEC);
-    Serial.print(' ');
-  }
-  Serial.println(' ');
+void commandSent(int length, byte* data) {
+  // do nothing
 }
 
 
@@ -60,16 +46,16 @@ void setup() {
   WheelDrive::setup();
 
   Serial.begin(9600);
-  Serial.println("INT SIZE: ");
-  Serial.println(sizeof(int));
-  Serial.println("CHAR SIZE: ");
-  Serial.println(sizeof(char));
-  Serial.println("FLOAT SIZE: ");
-  Serial.println(sizeof(float));
-  Serial.println("DOUBLE SIZE: ");
-  Serial.println(sizeof(double));
-  Serial.println("SHORT SIZE: ");
-  Serial.println(sizeof(short));
+  /* Serial.println("INT SIZE: "); */
+  /* Serial.println(sizeof(int)); */
+  /* Serial.println("BYTE SIZE: "); */
+  /* Serial.println(sizeof(byte)); */
+  /* Serial.println("FLOAT SIZE: "); */
+  /* Serial.println(sizeof(float)); */
+  /* Serial.println("DOUBLE SIZE: "); */
+  /* Serial.println(sizeof(double)); */
+  /* Serial.println("SHORT SIZE: "); */
+  /* Serial.println(sizeof(short)); */
 }
 
 

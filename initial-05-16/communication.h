@@ -1,10 +1,11 @@
 #ifndef COMMUNICATION_H_DEFINED
 #define COMMUNICATION_H_DEFINED
 
+#include <Arduino.h>
 #include <Wire.h>
 #include "state.h"
 
-typedef void (*CommunicationCallback)(int, char*);
+typedef void (*CommunicationCallback)(int, byte*);
 
 namespace Communicator {
 

@@ -11,9 +11,9 @@ namespace Communicator {
 
     State* state;
 
-    char* responseData = new char[MAX_RESPONSE_LENGTH];
+    byte* responseData = new byte[MAX_RESPONSE_LENGTH];
 
-    char* receivedData = new char[MAX_REQUEST_LENGTH];
+    byte* receivedData = new byte[MAX_REQUEST_LENGTH];
 
     int receivedDataLength = MAX_REQUEST_LENGTH;
 
@@ -68,19 +68,21 @@ namespace Communicator {
   }
 
   void sendData() {
-    serializeData();
-    if(sendCallback != NULL) {
-      sendCallback(responseDataLength, receivedData);
-    }
-    Wire.write(responseData, responseDataLength);
+      serializeData();
+      if(sendCallback != NULL) {
+        sendCallback(responseDataLength, responseData);
+      }
+      Wire.write(responseData, responseDataLength);
   }
 
   void serializeData() {
     int dist_length = NUM_DISTANCE_SENSORS * sizeof(int);
-    for (int i = 0; i < MAX_RESPONSE_LENGTH; ++i) {
-      responseData[i] = 0;
+    for (int i = 0; i < NUM_DISTANCE_SENSORS; ++i) {
+      int dist = state->getDistanceFor(i);
+      int idx = i * sizeof(int);
+      responseData[idx] = highByte(dist);
+      responseData[idx + 1] = lowByte(dist);
     }
-    memcpy(&responseData, state->getDistances(), dist_length);
     responseDataLength = dist_length;
   }
 
