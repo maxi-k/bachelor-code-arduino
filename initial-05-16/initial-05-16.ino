@@ -38,9 +38,7 @@ void commandSent(int length, byte* data) {
 
 
 void setup() {
-  int distances[3] = {10, 4, 3};
   state = new State();
-  state->setDistances(distances);
 
   Communicator::setup(state, &commandReceived, &commandSent);
   WheelDrive::setup();
@@ -60,5 +58,7 @@ void setup() {
 
 
 void loop() {
-  delay(10);
+  for (int i = 0; i < NUM_DISTANCE_SENSORS; ++i) {
+    state->setDistanceFor(i, random(0, 1370));
+  }
 }
