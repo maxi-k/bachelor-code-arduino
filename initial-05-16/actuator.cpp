@@ -27,44 +27,67 @@ namespace WheelDrive {
       }
     }
 
-    void regulatePID() {
-      Omni.PIDRegulate();
+    MotorWheel* getWheel(wheel w) {
+      switch(w) {
+      case backWheel:
+        return &wheel1;
+      case rightWheel:
+        return &wheel2;
+      case leftWheel:
+        return &wheel3;
+      }
     }
   }
 
+
   void setup() {
     Omni.PIDEnable(0.26, 0.02, 0, 10);
+    // Omni.PIDEnable(0.26, 0, 0, 10);
   }
 
   void goForward(unsigned int distance) {
     setStopSpeed(Omni3WD::STAT_ADVANCE);
     Omni.setCarAdvance(distance);
-    regulatePID();
   }
 
 
   void goLeft(unsigned int distance) {
     setStopSpeed(Omni3WD::STAT_LEFT);
     Omni.setCarLeft(distance);
-    regulatePID();
   }
 
 
   void goRight(unsigned int distance) {
     setStopSpeed(Omni3WD::STAT_RIGHT);
     Omni.setCarRight(distance);
-    regulatePID();
   }
 
   void rotateRight(unsigned int angle) {
     setStopSpeed(Omni3WD::STAT_ROTATERIGHT);
     Omni.setCarRotateRight(angle);
-    regulatePID();
   }
 
   void stop() {
     Omni.setCarStop();
-    regulatePID();
+    // wheel1.setSpeedMMPS(1);
+    // wheel2.setSpeedMMPS(1);
+    // wheel3.setSpeedMMPS(1);
+  }
+
+  void regulatePID() {
+    Omni.PIDRegulate();
+  }
+
+  unsigned int setWheelSpeed(wheel wheel, unsigned int speed) {
+    MotorWheel* instance = getWheel(wheel);
+    instance->setSpeedMMPS(speed, DIR_ADVANCE);
+    // instance->PIDRegulate();
+  }
+
+  void getSpeeds(int* speedArray) {
+    speedArray[0] = wheel1.getSpeedMMPS();
+    speedArray[1] = wheel2.getSpeedMMPS();
+    speedArray[2] = wheel3.getSpeedMMPS();
   }
 
 }

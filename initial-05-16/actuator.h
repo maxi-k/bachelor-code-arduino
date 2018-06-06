@@ -6,6 +6,12 @@
 
 namespace WheelDrive {
 
+  enum wheel {
+    backWheel,
+    rightWheel,
+    leftWheel
+  };
+
   void setup();
 
   void goLeft(unsigned int distance);
@@ -16,7 +22,13 @@ namespace WheelDrive {
 
   void rotateRight(unsigned int angle);
 
+  unsigned int setWheelSpeed(wheel wheel, unsigned int speed);
+
   void stop();
+
+  void regulatePID();
+
+  void getSpeeds(int* speedArray);
 
 };
 

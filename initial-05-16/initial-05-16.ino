@@ -11,30 +11,44 @@ enum direction {
 };
 
 State* state;
-unsigned int dist = 50;
+unsigned int dist = 70;
+byte cmd = 0;
+bool received = false;
+
+void execCommand() {
+  if (!received) {
+    return;
+  }
+  switch(cmd) {
+  case left:
+    WheelDrive::goLeft(dist);
+    /* WheelDrive::setWheelSpeed(WheelDrive::leftWheel, dist); */
+    return;
+  case right:
+    WheelDrive::goRight(dist);
+    /* WheelDrive::setWheelSpeed(WheelDrive::rightWheel, dist); */
+    return;
+  case forward:
+    WheelDrive::goForward(dist);
+    /* WheelDrive::setWheelSpeed(WheelDrive::backWheel, dist); */
+    return;
+  case stop:
+    WheelDrive::stop();
+    return;
+  }
+  received = false;
+}
 
 void commandReceived(int length, byte* data) {
   byte inByte = data[0];
-  switch(inByte) {
-  case left:
-    WheelDrive::goLeft(dist);
-    break;
-  case right:
-    WheelDrive::goRight(dist);
-    break;
-  case forward:
-    WheelDrive::goForward(dist);
-    break;
-  case stop:
-  default:
-    WheelDrive::stop();
-    break;
-  }
+  cmd = inByte;
+  received = true;
 }
 
 void commandSent(int length, byte* data) {
   // do nothing
 }
+
 
 
 void setup() {
@@ -57,8 +71,23 @@ void setup() {
 }
 
 
+int loopCnt = 0;
 void loop() {
-  for (int i = 0; i < NUM_DISTANCE_SENSORS; ++i) {
-    state->setDistanceFor(i, random(0, 1370));
+  /* for (int i = 0; i < NUM_DISTANCE_SENSORS; ++i) { */
+  /*   state->setDistanceFor(i, random(0, 1370)); */
+  /* } */
+
+  if (loopCnt == 0)
+  {
+    if (cmd == 's')
+      cmd = 'w';
+    else
+      cmd = 's';
+    received = true;
+    execCommand();
   }
+  Serial.println(loopCnt);
+  WheelDrive::regulatePID();
+  WheelDrive::getSpeeds(state->getDistances());
+  loopCnt = (loopCnt + 1) % 500;
 }
