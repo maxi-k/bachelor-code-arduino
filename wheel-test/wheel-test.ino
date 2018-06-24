@@ -1,5 +1,4 @@
 #include <MotorWheel.h>
-#include <PID_Beta6.h>
 #include <PinChangeInt.h>
 #include <PinChangeIntConfig.h>
 
@@ -16,54 +15,26 @@ MotorWheel wheel3(3,2,4,5,&irq3);        // Pin3:PWM, Pin2:DIR, Pin4:PhaseA, Pin
 void setup() {
   TCCR1B=TCCR1B&0xf8|0x01;    // Pin9,Pin10 PWM 31250Hz
   TCCR2B=TCCR2B&0xf8|0x01;    // Pin3,Pin11 PWM 31250Hz
-
-  float p = 0.26;
-  float i = 0.02;
-  float d = 0;
-  int time = 10;
-
-  wheel1.PIDEnable(p, i, d, time);
-  wheel2.PIDEnable(p, i, d, time);
-  wheel3.PIDEnable(p, i, d, time);
-
-  wheel3.setSpeedMMPS(20, DIR_ADVANCE);
 }
 
 void testWheel(MotorWheel *wheel) {
-  int times = 100;
-  int step = 10;
-  int timeout = 500;
-  int speed = 10;
+  int time = 3000; // 3s
+  int pwm1 = 254; // max = 255
+  int pwm2 = 32; // max = 255
 
-  /* wheel->setSpeedMMPS(speed, DIR_ADVANCE); */
+  wheel->runPWM(pwm1, DIR_ADVANCE);
+  delay(time);
 
-  for(int i=0;i<times;++i) {
-    wheel->PIDRegulate(true);
-    delay(step);
-  }
-  delay(timeout);
-
-  /* wheel->setSpeedMMPS(0, DIR_ADVANCE); */
-  wheel->setSpeedRPM(0, DIR_ADVANCE);
-  wheel->runPWM(0, false, false);
-
-  for(int i=0;i<times;++i) {
-    wheel->PIDRegulate(true);
-    delay(step);
-  }
-  delay(timeout);
+  wheel->runPWM(pwm2, DIR_BACKOFF);
+  delay(time);
 
 }
 
 void loop() {
-  int timeout = 500;
 
-  /* testWheel(&wheel1); */
-  /* delay(timeout); */
+  testWheel(&wheel1);
 
-  /* testWheel(&wheel2); */
-  /* delay(timeout); */
+  testWheel(&wheel2);
 
   testWheel(&wheel3);
-  delay(timeout);
 }
