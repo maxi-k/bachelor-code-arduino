@@ -12,7 +12,7 @@ irqISR(irq1,isr1);
 MotorWheel wheel1(9,8,6,7,&irq1);
 
 irqISR(irq2,isr2);
-MotorWheel wheel2(10,11,12,13,&irq2);
+MotorWheel wheel2(10,11,14,15,&irq2);
 
 irqISR(irq3,isr3);
 MotorWheel wheel3(3,2,4,5,&irq3);
