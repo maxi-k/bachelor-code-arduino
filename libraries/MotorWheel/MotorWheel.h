@@ -347,7 +347,7 @@ private:
 #define PI 3.1416
 #endif
 //#define CIR 31.4	// cm
-#define CIRMM 188	// mm
+#define CIRMM 314	// mm
 class MotorWheel: public GearedMotor {	// 
 public:
 	MotorWheel(unsigned char _pinPWM,unsigned char _pinDir,

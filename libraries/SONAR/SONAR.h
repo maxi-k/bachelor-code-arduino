@@ -84,7 +84,7 @@ public:
 			tempCmdSize=6,
 			tempDatSize=8,
 			bufSize=8,
-			duration=50,
+			duration=60,
 			baudRate=19200,
 	};
 
