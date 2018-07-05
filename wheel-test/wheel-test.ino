@@ -20,7 +20,7 @@ void setup() {
 void testWheel(MotorWheel *wheel) {
   int time = 3000; // 3s
   int pwm1 = 254; // max = 255
-  int pwm2 = 32; // max = 255
+  int pwm2 = 0; // max = 255
 
   wheel->runPWM(pwm1, DIR_ADVANCE);
   delay(time);

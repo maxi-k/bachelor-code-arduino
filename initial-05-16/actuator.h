@@ -14,19 +14,17 @@ namespace WheelDrive {
 
   void setup();
 
+  void setSpeed(wheel wheel, unsigned int speed, bool direction);
+
   void goLeft(unsigned int distance);
 
   void goRight(unsigned int distance);
 
   void goForward(unsigned int distance);
 
-  void rotateRight(unsigned int angle);
-
-  unsigned int setWheelSpeed(wheel wheel, unsigned int speed);
+  void rotate(unsigned int speed, bool direction);
 
   void stop();
-
-  void regulatePID();
 
   void getSpeeds(int* speedArray);
 

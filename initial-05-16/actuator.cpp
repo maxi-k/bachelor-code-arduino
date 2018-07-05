@@ -1,5 +1,10 @@
 #include "actuator.h"
 
+// Defined by MotorWheel.h and used here:
+// MAX_PWM
+// DIR_ADVANCE
+// DIR_BACKOFF
+
 namespace WheelDrive {
 
   /**
@@ -19,13 +24,7 @@ namespace WheelDrive {
     MotorWheel wheel3(3,2,4,5,&irq3);
 
     // Set up Omni wheel drive with those wheels
-    Omni3WD Omni(&wheel1,&wheel2,&wheel3);
-
-    void setStopSpeed(char state) {
-      if (Omni.getCarStat() != state) {
-        Omni.setCarSlow2Stop(500);
-      }
-    }
+    // Omni3WD Omni(&wheel1,&wheel2,&wheel3);
 
     MotorWheel* getWheel(wheel w) {
       switch(w) {
@@ -39,55 +38,61 @@ namespace WheelDrive {
     }
   }
 
-
   void setup() {
-    Omni.PIDEnable(0.26, 0.02, 0, 10);
-    // Omni.PIDEnable(0.26, 0, 0, 10);
+    TCCR1B=TCCR1B&0xf8|0x01;    // Pin9,Pin10 PWM 31250Hz
+    TCCR2B=TCCR2B&0xf8|0x01;    // Pin3,Pin11 PWM 31250Hz
+    // Omni.PIDEnable(0.26, 0.02, 0, 10);
+  }
+
+  int mmpsToRPM(MotorWheel *wheel, int speedMMPS) {
+    return int(speedMMPS * 60.0 / wheel->getCirMM());
+  }
+
+  int rpmToPWM(unsigned int speedRPM) {
+    // Constants defined in MotorWheel
+    return map(speedRPM, 0, MAX_SPEEDRPM, 0, MAX_PWM);
+  }
+
+  void setWheelSpeed(MotorWheel *wheel, unsigned int speedMMPS, bool direction) {
+    // int pwm = rpmToPWM(mmpsToRPM(wheel, speedMMPS));
+    wheel->runPWM(speedMMPS, direction);
+  }
+
+  void setSpeed(wheel which, unsigned int speedMMPS, bool direction) {
+    setWheelSpeed(getWheel(which), speedMMPS, direction);
+  }
+
+  void rotate(unsigned int angle, bool direction) {
+    setSpeed(leftWheel, angle, direction);
+    setSpeed(rightWheel, angle, direction);
+    setSpeed(backWheel, angle, direction);
   }
 
   void goForward(unsigned int distance) {
-    setStopSpeed(Omni3WD::STAT_ADVANCE);
-    Omni.setCarAdvance(distance);
+    setSpeed(rightWheel, distance, DIR_ADVANCE);
+    setSpeed(leftWheel, distance, DIR_BACKOFF);
   }
-
 
   void goLeft(unsigned int distance) {
-    setStopSpeed(Omni3WD::STAT_LEFT);
-    Omni.setCarLeft(distance);
+    setSpeed(rightWheel, distance, DIR_ADVANCE);
+    setSpeed(backWheel, distance, DIR_BACKOFF);
   }
-
 
   void goRight(unsigned int distance) {
-    setStopSpeed(Omni3WD::STAT_RIGHT);
-    Omni.setCarRight(distance);
-  }
-
-  void rotateRight(unsigned int angle) {
-    setStopSpeed(Omni3WD::STAT_ROTATERIGHT);
-    Omni.setCarRotateRight(angle);
+    setSpeed(leftWheel, distance, DIR_ADVANCE);
+    setSpeed(backWheel, distance, DIR_BACKOFF);
   }
 
   void stop() {
-    Omni.setCarStop();
-    // wheel1.setSpeedMMPS(1);
-    // wheel2.setSpeedMMPS(1);
-    // wheel3.setSpeedMMPS(1);
-  }
-
-  void regulatePID() {
-    Omni.PIDRegulate();
-  }
-
-  unsigned int setWheelSpeed(wheel wheel, unsigned int speed) {
-    MotorWheel* instance = getWheel(wheel);
-    instance->setSpeedMMPS(speed, DIR_ADVANCE);
-    // instance->PIDRegulate();
+    setSpeed(leftWheel, 0, DIR_ADVANCE);
+    setSpeed(rightWheel, 0, DIR_ADVANCE);
+    setSpeed(backWheel, 0, DIR_ADVANCE);
   }
 
   void getSpeeds(int* speedArray) {
-    speedArray[0] = wheel1.getSpeedMMPS();
-    speedArray[1] = wheel2.getSpeedMMPS();
-    speedArray[2] = wheel3.getSpeedMMPS();
+    speedArray[0] = wheel1.getPWM();
+    speedArray[1] = wheel2.getPWM();
+    speedArray[2] = wheel3.getPWM();
   }
 
 }

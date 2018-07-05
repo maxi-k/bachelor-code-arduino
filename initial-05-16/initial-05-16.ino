@@ -7,7 +7,8 @@ enum direction {
   left = 'a',
   right = 'd',
   forward = 'w',
-  stop = 's'
+  stop = 's',
+  rotate = 'r'
 };
 
 State* state;
@@ -31,6 +32,9 @@ void execCommand() {
   case forward:
     WheelDrive::goForward(dist);
     /* WheelDrive::setWheelSpeed(WheelDrive::backWheel, dist); */
+    return;
+  case rotate:
+    WheelDrive::rotate(dist, true);
     return;
   case stop:
     WheelDrive::stop();
@@ -77,17 +81,9 @@ void loop() {
   /*   state->setDistanceFor(i, random(0, 1370)); */
   /* } */
 
-  if (loopCnt == 0)
-  {
-    if (cmd == 's')
-      cmd = 'w';
-    else
-      cmd = 's';
-    received = true;
-    execCommand();
-  }
-  Serial.println(loopCnt);
-  WheelDrive::regulatePID();
+  execCommand();
+
+  /* Serial.println(loopCnt); */
   WheelDrive::getSpeeds(state->getDistances());
   loopCnt = (loopCnt + 1) % 500;
 }
