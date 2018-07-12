@@ -3,57 +3,52 @@
 #include "communication.h"
 #include "state.h"
 
-enum direction {
-  left = 'a',
-  right = 'd',
-  forward = 'w',
-  stop = 's',
-  rotate = 'r'
-};
-
 State* state;
-unsigned int dist = 70;
-byte cmd = 0;
+int cmdLength = Communicator::MAX_REQUEST_LENGTH;
+byte* cmd = new byte[Communicator::MAX_REQUEST_LENGTH];
 bool received = false;
 
 void execCommand() {
   if (!received) {
     return;
   }
-  switch(cmd) {
-  case left:
-    WheelDrive::goLeft(dist);
-    /* WheelDrive::setWheelSpeed(WheelDrive::leftWheel, dist); */
-    return;
-  case right:
-    WheelDrive::goRight(dist);
-    /* WheelDrive::setWheelSpeed(WheelDrive::rightWheel, dist); */
-    return;
-  case forward:
-    WheelDrive::goForward(dist);
-    /* WheelDrive::setWheelSpeed(WheelDrive::backWheel, dist); */
-    return;
-  case rotate:
-    WheelDrive::rotate(dist, true);
-    return;
-  case stop:
-    WheelDrive::stop();
-    return;
+  char flag = cmd[0];
+  // Serial.write(cmd, cmdLength);
+  // Serial.println("----------");
+  switch(flag) {
+  case Communicator::msgDistData:
+    // this is the flag used to send distance data back,
+    // so it should never be received.
+    // Serial.println("Message dist data command!");
+    break;
+  case Communicator::cmdUpdate:
+    // update is sent automatically by communication namespace
+    // Serial.println("Update command!");
+    break;
+  case Communicator::cmdSpeed:
+    char dir = cmd[1];
+    byte speed = cmd[2];
+    // Serial.println("Wheel drive!");
+    /* WheelDrive::execCommand((WheelDrive::driveCommand) dir, speed); */
+    break;
   }
   received = false;
 }
 
 void commandReceived(int length, byte* data) {
-  byte inByte = data[0];
-  cmd = inByte;
+  // copy data to received buffer
+  // Serial.println("Received message!");
+  int commonLength = min(length, Communicator::MAX_REQUEST_LENGTH);
+  for(int i = 0; i < commonLength; ++i) {
+    cmd[i] = data[i];
+  }
+  cmdLength = commonLength;
   received = true;
 }
 
 void commandSent(int length, byte* data) {
   // do nothing
 }
-
-
 
 void setup() {
   state = new State();
@@ -82,6 +77,10 @@ void loop() {
   /* } */
 
   execCommand();
+
+  /* if (loopCnt == 400) { */
+  /*   Serial.println("loop"); */
+  /* } */
 
   /* Serial.println(loopCnt); */
   WheelDrive::getSpeeds(state->getDistances());

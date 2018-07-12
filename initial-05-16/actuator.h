@@ -12,6 +12,14 @@ namespace WheelDrive {
     leftWheel
   };
 
+  enum driveCommand {
+    cmdLeft = 'a',
+    cmdRight = 'd',
+    cmdForward = 'w',
+    cmdStop = 's',
+    cmdRotate = 'r'
+  };
+
   void setup();
 
   void setSpeed(wheel wheel, unsigned int speed, bool direction);
@@ -27,6 +35,8 @@ namespace WheelDrive {
   void stop();
 
   void getSpeeds(int* speedArray);
+
+  void execCommand(driveCommand dir, int speed);
 
 };
 

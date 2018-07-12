@@ -95,4 +95,23 @@ namespace WheelDrive {
     speedArray[2] = wheel3.getPWM();
   }
 
+  void execCommand(driveCommand dir, int speed) {
+    switch(dir) {
+    case cmdLeft:
+      goLeft(speed);
+      return;
+    case cmdRight:
+      goRight(dir);
+      return;
+    case cmdForward:
+      goForward(dir);
+      return;
+    case cmdRotate:
+      rotate(dir, true);
+      return;
+    case cmdStop:
+      stop();
+      return;
+    }
+  }
 }
