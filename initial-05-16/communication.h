@@ -9,13 +9,20 @@ typedef void (*CommunicationCallback)(int, byte*);
 
 namespace Communicator {
 
-  namespace {
-    const int MAX_RESPONSE_LENGTH = 32;
+  const int MAX_RESPONSE_LENGTH = 32;
 
-    const int MAX_REQUEST_LENGTH = 32;
+  const int MAX_REQUEST_LENGTH = 32;
 
-    const int SLAVE_ADDRESS = 0x04;
-  }
+  const int SLAVE_ADDRESS = 0x04;
+
+  enum messageFlag {
+    // message with distance data [int, int, int]
+    msgDistData = 'd',
+    // command for setting the speed
+    cmdSpeed = 's',
+    // command for sending back update (probably distance data)
+    cmdUpdate = 'u'
+  };
 
   void setup(State* state,
              CommunicationCallback recvCallback,

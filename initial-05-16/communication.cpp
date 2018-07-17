@@ -76,14 +76,26 @@ namespace Communicator {
   }
 
   void serializeData() {
+    // track the offset as the current position
+    // in the array
+    int cursor = 0;
+
+    // -- Set message flag
+    responseData[cursor] = msgDistData;
+    cursor += sizeof(msgDistData);
+
+    // -- Copy distance data
     int dist_length = NUM_DISTANCE_SENSORS * sizeof(int);
     for (int i = 0; i < NUM_DISTANCE_SENSORS; ++i) {
       int dist = state->getDistanceFor(i);
-      int idx = i * sizeof(int);
+      int idx = cursor + i * sizeof(int);
       responseData[idx] = highByte(dist);
       responseData[idx + 1] = lowByte(dist);
     }
-    responseDataLength = dist_length;
+    cursor += dist_length;
+
+    // -- Set length of response data to previously written data
+    responseDataLength = cursor;
   }
 
 }
