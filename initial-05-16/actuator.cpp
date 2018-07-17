@@ -2,9 +2,13 @@
 
 // Defined by MotorWheel.h and used here:
 // MAX_PWM
+// MAX_SPEEDRPM
 // DIR_ADVANCE
 // DIR_BACKOFF
 
+// TODO: Better distinguish between
+// 'absolute' speed :: (unsigned int) and
+// 'directional' speed :: (singed int)
 namespace WheelDrive {
 
   /**
@@ -26,6 +30,10 @@ namespace WheelDrive {
     // Set up Omni wheel drive with those wheels
     // Omni3WD Omni(&wheel1,&wheel2,&wheel3);
 
+    /**
+     * Get a pointer to a particular wheel instance
+     * based on the wheel enum given
+     */
     MotorWheel* getWheel(wheel w) {
       switch(w) {
       case backWheel:
@@ -36,26 +44,53 @@ namespace WheelDrive {
         return &wheel3;
       }
     }
+
+    /**
+     * Convert millimeters per second into rotations per minute
+     * for the given wheel
+     */
+    int mmpsToRPM(MotorWheel *wheel, int speedMMPS) {
+      return int(speedMMPS * 60.0 / wheel->getCirMM());
+    }
+
+    /**
+     * Inverse of mmpsToRPM
+     */
+    int rpmToMMPS(MotorWheel *wheel, int rpm) {
+      return int(rpm * wheel->getCirMM() / 60.0);
+    }
+
+    /**
+     * Convert rotations per minute into a PWM Signal
+     * strength between 0 and MAX_PWM
+     */
+    int rpmToPWM(unsigned int speedRPM) {
+      // Constants defined in MotorWheel
+      return map(speedRPM, 0, MAX_SPEEDRPM, 0, MAX_PWM);
+    }
+
+    /**
+     * Inverse of rpmToPWM
+     */
+    unsigned int pwmToRPM(unsigned int pwm) {
+      return map(pwm, 0, MAX_PWM, 0, MAX_SPEEDRPM);
+    }
+
+    void setWheelSpeed(MotorWheel *wheel, unsigned int speedMMPS, bool direction) {
+      int pwm = rpmToPWM(mmpsToRPM(wheel, speedMMPS));
+      wheel->runPWM(pwm, direction);
+    }
+
+    int getWheelSpeedMMPS(MotorWheel *wheel) {
+      return rpmToMMPS(wheel, pwmToRPM(wheel->getPWM()));
+    }
   }
 
   void setup() {
+    // setup PWM
     TCCR1B=TCCR1B&0xf8|0x01;    // Pin9,Pin10 PWM 31250Hz
     TCCR2B=TCCR2B&0xf8|0x01;    // Pin3,Pin11 PWM 31250Hz
     // Omni.PIDEnable(0.26, 0.02, 0, 10);
-  }
-
-  int mmpsToRPM(MotorWheel *wheel, int speedMMPS) {
-    return int(speedMMPS * 60.0 / wheel->getCirMM());
-  }
-
-  int rpmToPWM(unsigned int speedRPM) {
-    // Constants defined in MotorWheel
-    return map(speedRPM, 0, MAX_SPEEDRPM, 0, MAX_PWM);
-  }
-
-  void setWheelSpeed(MotorWheel *wheel, unsigned int speedMMPS, bool direction) {
-    // int pwm = rpmToPWM(mmpsToRPM(wheel, speedMMPS));
-    wheel->runPWM(speedMMPS, direction);
   }
 
   void setSpeed(wheel which, unsigned int speedMMPS, bool direction) {
@@ -90,9 +125,9 @@ namespace WheelDrive {
   }
 
   void getSpeeds(int* speedArray) {
-    speedArray[0] = wheel1.getPWM();
-    speedArray[1] = wheel2.getPWM();
-    speedArray[2] = wheel3.getPWM();
+    speedArray[0] = getWheelSpeedMMPS(&wheel1);
+    speedArray[1] = getWheelSpeedMMPS(&wheel2);
+    speedArray[2] = getWheelSpeedMMPS(&wheel3);
   }
 
   void execCommand(driveCommand dir, int speed) {

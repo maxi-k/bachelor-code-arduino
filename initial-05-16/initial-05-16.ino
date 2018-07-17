@@ -1,47 +1,73 @@
+#include "util.h"
 #include "sensor.h"
 #include "actuator.h"
 #include "communication.h"
 #include "state.h"
 
+/**
+ * Holds all relevant state of the Robot Control Program,
+ * Does not contain irrelevant (internal) state or
+ * messaging state (like the last received message).
+ */
 State* state;
+
+/**
+ * The length of the last received command.
+ * Actual size of the array 'cmd' may be larger,
+ * but never smaller.
+ */
 int cmdLength = Communicator::MAX_REQUEST_LENGTH;
+/**
+ * Buffer for the last received message.
+ */
 byte* cmd = new byte[Communicator::MAX_REQUEST_LENGTH];
+
+/**
+ * Stores whether a command was received that has not been
+ * executed yet.
+ */
 bool received = false;
 
+/**
+ * Execute the command stored in the 'cmd' array.
+ * After execution, set the 'received' flag to false,
+ * as the command was executed.
+ */
 void execCommand() {
   if (!received) {
     return;
   }
   char flag = cmd[0];
-  /* Serial.write(cmd, cmdLength); */
-  /* Serial.println("----------"); */
+  #if DEBUG
+    Serial.write(cmd, cmdLength);
+    Serial.println("----------");
+  #endif
   switch(flag) {
   case Communicator::msgDistData:
-    // this is the flag used to send distance data back,
-    // so it should never be received.
-    /* Serial.println("Message dist data command!"); */
     break;
   case Communicator::cmdUpdate:
-    // update is sent automatically by communication namespace
-    /* Serial.println("Update command!"); */
     break;
   case Communicator::cmdSpeed: {
     char dir = cmd[1];
     byte speed = cmd[2];
-    /* Serial.println("Wheel drive!"); */
     WheelDrive::execCommand((WheelDrive::driveCommand) dir, speed);
     break;
   }
   default:
+    #if DEBUG
     /* Serial.println("Command could not be interpreted!"); */
+    #endif
     break;
   }
   received = false;
 }
 
+/**
+ * Callback for when a message is received.
+ * Stores the received message in the 'cmd' buffer,
+ * and sets the 'received' flag to true.
+ */
 void commandReceived(int length, byte* data) {
-  // copy data to received buffer
-  /* Serial.println("Received message!"); */
   int commonLength = min(length, Communicator::MAX_REQUEST_LENGTH);
   for(int i = 0; i < commonLength; ++i) {
     cmd[i] = data[i];
@@ -50,10 +76,19 @@ void commandReceived(int length, byte* data) {
   received = true;
 }
 
+/**
+ * Callback for when a message was sent back to the controller.
+ * Currently does nothing.
+ */
 void commandSent(int length, byte* data) {
   // do nothing
 }
 
+/**
+ * Gets called by the arduino for initial setup.
+ * Initialize all state variables, the communication with the controller,
+ * as well as the sensors and actuators.
+ */
 void setup() {
   state = new State();
 
@@ -61,20 +96,14 @@ void setup() {
   WheelDrive::setup();
 
   Serial.begin(9600);
-  /* Serial.println("INT SIZE: "); */
-  /* Serial.println(sizeof(int)); */
-  /* Serial.println("BYTE SIZE: "); */
-  /* Serial.println(sizeof(byte)); */
-  /* Serial.println("FLOAT SIZE: "); */
-  /* Serial.println(sizeof(float)); */
-  /* Serial.println("DOUBLE SIZE: "); */
-  /* Serial.println(sizeof(double)); */
-  /* Serial.println("SHORT SIZE: "); */
-  /* Serial.println(sizeof(short)); */
 }
 
 
-int loopCnt = 0;
+/**
+ * Gets called by the arduino over and over ('main loop').
+ * Updates state variables and handles any commands received
+ * from the controller in the meantime.
+ */
 void loop() {
   for (int i = 0; i < NUM_DISTANCE_SENSORS; ++i) {
     state->setDistanceFor(i, random(0, 1370));
@@ -82,11 +111,5 @@ void loop() {
 
   execCommand();
 
-  /* if (loopCnt == 400) { */
-  /*   Serial.println("loop"); */
-  /* } */
-
-  /* Serial.println(loopCnt); */
   WheelDrive::getSpeeds(state->getDistances());
-  loopCnt = (loopCnt + 1) % 500;
 }
