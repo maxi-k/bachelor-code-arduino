@@ -3,4 +3,10 @@
 
 #include <SONAR.h>
 
+// TODO: Define interface and implement
+namespace DistanceSensor {
+
+}
+
+
 #endif
