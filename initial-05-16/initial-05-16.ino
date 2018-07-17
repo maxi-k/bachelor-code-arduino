@@ -95,7 +95,9 @@ void setup() {
   Communicator::setup(state, &commandReceived, &commandSent);
   WheelDrive::setup();
 
+  #if DEBUG
   Serial.begin(9600);
+  #endif
 }
 
 
