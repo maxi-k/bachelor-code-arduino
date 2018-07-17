@@ -13,23 +13,27 @@ void execCommand() {
     return;
   }
   char flag = cmd[0];
-  // Serial.write(cmd, cmdLength);
-  // Serial.println("----------");
+  /* Serial.write(cmd, cmdLength); */
+  /* Serial.println("----------"); */
   switch(flag) {
   case Communicator::msgDistData:
     // this is the flag used to send distance data back,
     // so it should never be received.
-    // Serial.println("Message dist data command!");
+    /* Serial.println("Message dist data command!"); */
     break;
   case Communicator::cmdUpdate:
     // update is sent automatically by communication namespace
-    // Serial.println("Update command!");
+    /* Serial.println("Update command!"); */
     break;
-  case Communicator::cmdSpeed:
+  case Communicator::cmdSpeed: {
     char dir = cmd[1];
     byte speed = cmd[2];
-    // Serial.println("Wheel drive!");
-    /* WheelDrive::execCommand((WheelDrive::driveCommand) dir, speed); */
+    /* Serial.println("Wheel drive!"); */
+    WheelDrive::execCommand((WheelDrive::driveCommand) dir, speed);
+    break;
+  }
+  default:
+    /* Serial.println("Command could not be interpreted!"); */
     break;
   }
   received = false;
@@ -37,7 +41,7 @@ void execCommand() {
 
 void commandReceived(int length, byte* data) {
   // copy data to received buffer
-  // Serial.println("Received message!");
+  /* Serial.println("Received message!"); */
   int commonLength = min(length, Communicator::MAX_REQUEST_LENGTH);
   for(int i = 0; i < commonLength; ++i) {
     cmd[i] = data[i];
@@ -72,9 +76,9 @@ void setup() {
 
 int loopCnt = 0;
 void loop() {
-  /* for (int i = 0; i < NUM_DISTANCE_SENSORS; ++i) { */
-  /*   state->setDistanceFor(i, random(0, 1370)); */
-  /* } */
+  for (int i = 0; i < NUM_DISTANCE_SENSORS; ++i) {
+    state->setDistanceFor(i, random(0, 1370));
+  }
 
   execCommand();
 
