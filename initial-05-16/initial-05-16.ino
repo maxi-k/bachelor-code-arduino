@@ -94,6 +94,7 @@ void setup() {
 
   Communicator::setup(state, &commandReceived, &commandSent);
   WheelDrive::setup();
+  DistanceSensor::setup(state);
 
   #if DEBUG
   Serial.begin(9600);
@@ -107,11 +108,18 @@ void setup() {
  * from the controller in the meantime.
  */
 void loop() {
-  for (int i = 0; i < NUM_DISTANCE_SENSORS; ++i) {
-    state->setDistanceFor(i, random(0, 1370));
+  execCommand();
+  DistanceSensor::update();
+
+  if (loopCnt == 499) {
+    Serial.println("hello!");
   }
 
-  execCommand();
+  /* if (loopCnt == 400) { */
+  /*   Serial.println("loop"); */
+  /* } */
 
-  WheelDrive::getSpeeds(state->getDistances());
+  /* Serial.println(loopCnt); */
+  /* WheelDrive::getSpeeds(state->getDistances()); */
+  loopCnt = (loopCnt + 1) % 500;
 }
