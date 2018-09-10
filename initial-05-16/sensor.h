@@ -21,5 +21,4 @@ namespace DistanceSensor {
 
 };
 
-
 #endif

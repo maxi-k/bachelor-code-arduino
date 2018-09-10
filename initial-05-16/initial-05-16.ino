@@ -1,5 +1,5 @@
 #include "util.h"
-#include "sensor.h"
+// #include "sensor.h"
 #include "actuator.h"
 #include "communication.h"
 #include "state.h"
@@ -94,7 +94,7 @@ void setup() {
 
   Communicator::setup(state, &commandReceived, &commandSent);
   WheelDrive::setup();
-  DistanceSensor::setup(state);
+  // DistanceSensor::setup(state);
 
   #if DEBUG
   Serial.begin(9600);
@@ -109,11 +109,7 @@ void setup() {
  */
 void loop() {
   execCommand();
-  DistanceSensor::update();
-
-  if (loopCnt == 499) {
-    Serial.println("hello!");
-  }
+  // DistanceSensor::update();
 
   /* if (loopCnt == 400) { */
   /*   Serial.println("loop"); */
@@ -121,5 +117,5 @@ void loop() {
 
   /* Serial.println(loopCnt); */
   /* WheelDrive::getSpeeds(state->getDistances()); */
-  loopCnt = (loopCnt + 1) % 500;
+  /* loopCnt = (loopCnt + 1) % 500; */
 }
