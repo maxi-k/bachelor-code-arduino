@@ -3,7 +3,7 @@
 #include <SONAR.h>
 #include "util.h"
 
-#define SONAR_PORT 11
+#define SONAR_PORT 0x11
 #define SONAR_COUNT 3
 
 namespace DistanceSensor {
@@ -22,13 +22,19 @@ namespace DistanceSensor {
     void getSonarData(State* state) {
       SONAR sonar = sonars[sonarToUpdate];
 
-      // Serial.print("SONAR TO UPDATE: ");
-      // Serial.println(sonarToUpdate);
+      // SONAR sonar = sonar11;
+      // int sdist = 91;
+      unsigned int dist = sonar.getDist();
+      int sdist = dist = (int) dist;
+      state->setDistanceFor(sonarToUpdate, sdist);
 
-      unsigned short dist = sonar.getDist();
-      state->setDistanceFor(sonarToUpdate, (int) dist);
+      #if ROBOT_CONTROL_DEBUG
+      Serial.print("Distance for Sensor ");
+      Serial.print(sonarToUpdate);
+      Serial.print(" is ");
+      Serial.println(sdist);
+      #endif
       sonar.trigger();
-      sonar.showDat();
 
       // Serial.print("distance: ");
       // Serial.println((int) dist, DEC);
@@ -40,16 +46,13 @@ namespace DistanceSensor {
   void setup(State* state) {
     stateRef = state;
 
-    // SONARAR(SONAR_PORT + SONAR_COUNT - 1);
-    SONAR::init(SONAR_PORT + SONAR_COUNT - 1);
+    // SONAR::init(SONAR_PORT + SONAR_COUNT - 1, 9600);
   }
 
   void update() {
-    unsigned long curTime = millis();
-
-    if (curTime - lastUpdateMillis >= SONAR::duration) {
+    if (millis() - lastUpdateMillis >= SONAR::duration) {
       getSonarData(stateRef);
-      lastUpdateMillis = curTime;
+      lastUpdateMillis = millis();
     }
   }
 

@@ -4,7 +4,7 @@ State::State() :
   distances(new int[NUM_DISTANCE_SENSORS]) {
 }
 
-bool State::setDistanceFor(unsigned int index, int distance) {
+bool State::setDistanceFor(int index, int distance) {
   if (index >= 0 && index < NUM_DISTANCE_SENSORS) {
     distances[index] = distance;
     return true;
@@ -22,7 +22,7 @@ void State::setDistances(int* newDists) {
   }
 }
 
-int State::getDistanceFor(unsigned int index) {
+int State::getDistanceFor(int index) {
   if (index >= 0 && index < NUM_DISTANCE_SENSORS) {
     return distances[index];
   }

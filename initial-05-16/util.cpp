@@ -6,6 +6,8 @@ namespace Util {
   #if ROBOT_CONTROL_DEBUG
 
   void printDataSizes() {
+    Serial.println("CHAR SIZE: ");
+    Serial.println(sizeof(char));
     Serial.println("INT SIZE: ");
     Serial.println(sizeof(int));
     Serial.println("BYTE SIZE: ");

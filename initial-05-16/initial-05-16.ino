@@ -101,11 +101,14 @@ void setup() {
 
   Communicator::setup(state, &commandReceived, &commandSent);
   WheelDrive::setup();
-//   DistanceSensor::setup(state);
 
   #if ROBOT_CONTROL_DEBUG
   Serial.begin(9600);
+  Util::printDataSizes();
   #endif
+  // Serial.begin(9600);
+
+  DistanceSensor::setup(state);
 }
 
 
@@ -115,6 +118,11 @@ void setup() {
  * from the controller in the meantime.
  */
 void loop() {
+  // Serial.println(state->getDistanceFor(0));
+  // Serial.println(state->getDistanceFor(0));
+  // Serial.println(state->getDistanceFor(1));
+  // Serial.println(state->getDistanceFor(2));
+
   execCommand();
   DistanceSensor::update();
 

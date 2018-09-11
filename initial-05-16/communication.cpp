@@ -82,10 +82,11 @@ namespace Communicator {
 
     // -- Set message flag
     responseData[cursor] = msgDistData;
-    cursor += sizeof(msgDistData);
+    cursor += 1;
 
     // -- Copy distance data
     int dist_length = NUM_DISTANCE_SENSORS * sizeof(int);
+
     for (int i = 0; i < NUM_DISTANCE_SENSORS; ++i) {
       int dist = state->getDistanceFor(i);
       int idx = cursor + i * sizeof(int);

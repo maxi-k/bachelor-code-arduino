@@ -6,7 +6,7 @@
  * Used in various places to decide
  * whether to print to Serial etc.
  */
-#define ROBOT_CONTROL_DEBUG true
+// #define ROBOT_CONTROL_DEBUG true
 
 namespace Util {
 
