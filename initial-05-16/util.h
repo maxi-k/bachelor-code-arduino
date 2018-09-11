@@ -6,11 +6,11 @@
  * Used in various places to decide
  * whether to print to Serial etc.
  */
-// #define DEBUG true
+#define ROBOT_CONTROL_DEBUG true
 
 namespace Util {
 
-  #if DEBUG
+  #if ROBOT_CONTROL_DEBUG
 
   void printDataSizes();
 

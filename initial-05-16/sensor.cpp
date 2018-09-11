@@ -1,6 +1,7 @@
 #include "sensor.h"
 
 #include <SONAR.h>
+#include "util.h"
 
 #define SONAR_PORT 11
 #define SONAR_COUNT 3
@@ -39,6 +40,7 @@ namespace DistanceSensor {
   void setup(State* state) {
     stateRef = state;
 
+    // SONARAR(SONAR_PORT + SONAR_COUNT - 1);
     SONAR::init(SONAR_PORT + SONAR_COUNT - 1);
   }
 

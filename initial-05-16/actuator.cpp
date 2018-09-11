@@ -1,4 +1,5 @@
 #include "actuator.h"
+#include "util.h"
 
 // Defined by MotorWheel.h and used here:
 // MAX_PWM
@@ -45,6 +46,34 @@ namespace WheelDrive {
       }
     }
 
+    #if ROBOT_CONTROL_DEBUG
+    void debugCommand(driveCommand dir, int speed) {
+      Serial.println("<executing command>");
+      switch(dir) {
+      case cmdLeft:
+        Serial.println("left");
+        break;
+      case cmdRight:
+        Serial.println("right");
+        break;
+      case cmdForward:
+        Serial.println("forward");
+        break;
+      case cmdRotate:
+        Serial.println("rotate");
+        break;
+      case cmdStop:
+        Serial.println("stop");
+        break;
+      case cmdBackward:
+        Serial.println("backward");
+        break;
+      }
+      Serial.println(speed);
+      Serial.println("</executing command:>");
+    }
+    #endif
+
     /**
      * Convert millimeters per second into rotations per minute
      * for the given wheel
@@ -77,13 +106,14 @@ namespace WheelDrive {
     }
 
     void setWheelSpeed(MotorWheel *wheel, unsigned int speedMMPS, bool direction) {
-      int pwm = rpmToPWM(mmpsToRPM(wheel, speedMMPS));
-      wheel->runPWM(pwm, direction);
+      // int pwm = rpmToPWM(mmpsToRPM(wheel, speedMMPS));
+      wheel->runPWM(speedMMPS, direction);
     }
 
     int getWheelSpeedMMPS(MotorWheel *wheel) {
       return rpmToMMPS(wheel, pwmToRPM(wheel->getPWM()));
     }
+
   }
 
   void setup() {
@@ -106,6 +136,11 @@ namespace WheelDrive {
   void goForward(unsigned int distance) {
     setSpeed(rightWheel, distance, DIR_ADVANCE);
     setSpeed(leftWheel, distance, DIR_BACKOFF);
+  }
+
+  void goBackward(unsigned int distance) {
+    setSpeed(rightWheel, distance, DIR_BACKOFF);
+    setSpeed(leftWheel, distance, DIR_ADVANCE);
   }
 
   void goLeft(unsigned int distance) {
@@ -131,22 +166,30 @@ namespace WheelDrive {
   }
 
   void execCommand(driveCommand dir, int speed) {
+    #if ROBOT_CONTROL_DEBUG
+    debugCommand(dir, speed);
+    #else
     switch(dir) {
     case cmdLeft:
       goLeft(speed);
       return;
     case cmdRight:
-      goRight(dir);
+      goRight(speed);
       return;
     case cmdForward:
-      goForward(dir);
+      goForward(speed);
       return;
     case cmdRotate:
-      rotate(dir, true);
+      rotate(speed, true);
       return;
     case cmdStop:
       stop();
       return;
+    case cmdBackward:
+      goBackward(speed);
+      return;
     }
+    #endif
   }
+
 }

@@ -1,5 +1,5 @@
 #include "util.h"
-// #include "sensor.h"
+#include "sensor.h"
 #include "actuator.h"
 #include "communication.h"
 #include "state.h"
@@ -38,8 +38,9 @@ void execCommand() {
     return;
   }
   char flag = cmd[0];
-  #if DEBUG
+  #if ROBOT_CONTROL_DEBUG
     Serial.write(cmd, cmdLength);
+    Serial.println("");
     Serial.println("----------");
   #endif
   switch(flag) {
@@ -49,13 +50,15 @@ void execCommand() {
     break;
   case Communicator::cmdSpeed: {
     char dir = cmd[1];
-    byte speed = cmd[2];
+    byte speed_low = cmd[2];
+    byte speed_high = cmd[3];
+    int speed = speed_low * 256 + speed_high;
     WheelDrive::execCommand((WheelDrive::driveCommand) dir, speed);
     break;
   }
   default:
-    #if DEBUG
-    /* Serial.println("Command could not be interpreted!"); */
+    #if ROBOT_CONTROL_DEBUG
+    Serial.println("Command could not be interpreted!");
     #endif
     break;
   }
@@ -68,6 +71,10 @@ void execCommand() {
  * and sets the 'received' flag to true.
  */
 void commandReceived(int length, byte* data) {
+  #if ROBOT_CONTROL_DEBUG
+    Serial.print("Request length: ");
+    Serial.println(length);
+  #endif
   int commonLength = min(length, Communicator::MAX_REQUEST_LENGTH);
   for(int i = 0; i < commonLength; ++i) {
     cmd[i] = data[i];
@@ -94,9 +101,9 @@ void setup() {
 
   Communicator::setup(state, &commandReceived, &commandSent);
   WheelDrive::setup();
-  // DistanceSensor::setup(state);
+//   DistanceSensor::setup(state);
 
-  #if DEBUG
+  #if ROBOT_CONTROL_DEBUG
   Serial.begin(9600);
   #endif
 }
@@ -109,7 +116,7 @@ void setup() {
  */
 void loop() {
   execCommand();
-  // DistanceSensor::update();
+  DistanceSensor::update();
 
   /* if (loopCnt == 400) { */
   /*   Serial.println("loop"); */

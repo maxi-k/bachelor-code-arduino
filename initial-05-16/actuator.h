@@ -25,6 +25,7 @@ namespace WheelDrive {
     cmdRight = 'd',
     cmdForward = 'w',
     cmdStop = 's',
+    cmdBackward = 'b',
     cmdRotate = 'r'
   };
 
@@ -57,6 +58,12 @@ namespace WheelDrive {
    * with the given 'speed' (in MMPS).
    */
   void goForward(unsigned int speed);
+
+  /**
+   * Set the wheel speeds and directions so that the robot moves backward
+   * with the given 'speed' (in MMPS).
+   */
+  void goBackward(unsigned int speed);
 
   /**
    * Set the wheel speeds and directions so that the robot rotates

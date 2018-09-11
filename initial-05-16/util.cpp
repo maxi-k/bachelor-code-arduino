@@ -3,7 +3,7 @@
 
 namespace Util {
 
-  #if DEBUG
+  #if ROBOT_CONTROL_DEBUG
 
   void printDataSizes() {
     Serial.println("INT SIZE: ");
