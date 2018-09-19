@@ -8,6 +8,7 @@
  * Holds all relevant state of the Robot Control Program,
  * Does not contain irrelevant (internal) state or
  * messaging state (like the last received message).
+ * This is initialized in the setup function.
  */
 State* state;
 
@@ -58,7 +59,7 @@ void execCommand() {
   }
   default:
     #if ROBOT_CONTROL_DEBUG
-    Serial.println("Command could not be interpreted!");
+      Serial.println("Command could not be interpreted!");
     #endif
     break;
   }
@@ -103,10 +104,9 @@ void setup() {
   WheelDrive::setup();
 
   #if ROBOT_CONTROL_DEBUG
-  Serial.begin(9600);
-  Util::printDataSizes();
+    Serial.begin(9600);
+    Util::printDataSizes();
   #endif
-  // Serial.begin(9600);
 
   DistanceSensor::setup(state);
 }
@@ -118,19 +118,6 @@ void setup() {
  * from the controller in the meantime.
  */
 void loop() {
-  // Serial.println(state->getDistanceFor(0));
-  // Serial.println(state->getDistanceFor(0));
-  // Serial.println(state->getDistanceFor(1));
-  // Serial.println(state->getDistanceFor(2));
-
   execCommand();
   DistanceSensor::update();
-
-  /* if (loopCnt == 400) { */
-  /*   Serial.println("loop"); */
-  /* } */
-
-  /* Serial.println(loopCnt); */
-  /* WheelDrive::getSpeeds(state->getDistances()); */
-  /* loopCnt = (loopCnt + 1) % 500; */
 }

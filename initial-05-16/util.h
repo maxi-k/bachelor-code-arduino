@@ -12,6 +12,11 @@ namespace Util {
 
   #if ROBOT_CONTROL_DEBUG
 
+  /**
+   * Print the length of the different
+   * data-type sizes on this board to the
+   * Serial output (as a multiple of char)
+   */
   void printDataSizes();
 
   #endif
